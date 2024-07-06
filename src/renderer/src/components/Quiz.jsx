@@ -116,7 +116,7 @@ function Quiz() {
   return (
     <Box p={4} borderWidth={1} borderRadius="lg">
       {currentQuestion ? (
-        <>
+        <Box w="705px">
           <Heading size="md" mt={4}>
             {currentQuestion.question}
           </Heading>
@@ -151,14 +151,14 @@ function Quiz() {
               ))}
           </Box>
           <Box mt={4} display="flex" justifyContent="space-between">
-            <Button onClick={() => setShowTip(true)} mt={4}>
+            <Button onClick={() => setShowTip(true)} mt={4} isDisabled={showTip}>
               {formatMessage({ id: 'show-tip' })}
             </Button>
             <Button onClick={handleNextQuestion} mt={4}>
               {formatMessage({ id: 'next-question' })}
             </Button>
           </Box>
-        </>
+        </Box>
       ) : (
         <Text mt={4}>{formatMessage({ id: 'no-questions-available' })}</Text>
       )}
