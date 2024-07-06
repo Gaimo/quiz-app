@@ -118,7 +118,7 @@ function CategoryEditor() {
   }
 
   return (
-    <Box p={4}>
+    <Box p={4} maxW="600px">
       <Heading mt={4} mb={4}>
         {formatMessage({ id: 'categories-heading' })}
       </Heading>
@@ -150,9 +150,9 @@ function CategoryEditor() {
             <Table variant="simple">
               <Thead>
                 <Tr>
-                  <Th>{formatMessage({ id: 'id-column' })}</Th>
+                  <Th w="30px">{formatMessage({ id: 'id-column' })}</Th>
                   <Th>{formatMessage({ id: 'category-column' })}</Th>
-                  <Th>{formatMessage({ id: 'action-column' })}</Th>
+                  <Th w="100px">{formatMessage({ id: 'action-column' })}</Th>
                 </Tr>
               </Thead>
               <Tbody>
