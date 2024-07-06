@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Box,
   Heading,
@@ -8,9 +8,21 @@ import {
   Button,
   Select,
   IconButton,
-  useToast
+  useToast,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay
 } from '@chakra-ui/react'
-import { DeleteIcon } from '@chakra-ui/icons'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 
 const QuestionEditor = () => {
   const [question, setQuestion] = useState('')
@@ -19,7 +31,13 @@ const QuestionEditor = () => {
   const [tip, setTip] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [categories, setCategories] = useState([])
+  const [questions, setQuestions] = useState([])
+  const [isEditing, setIsEditing] = useState(false)
+  const [editingQuestionId, setEditingQuestionId] = useState(null)
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const [deletingQuestionId, setDeletingQuestionId] = useState(null)
   const toast = useToast()
+  const cancelRef = useRef()
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -27,6 +45,14 @@ const QuestionEditor = () => {
       setCategories(categories)
     }
     fetchCategories()
+  }, [])
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const questions = await window.api.invoke('get-questions')
+      setQuestions(questions)
+    }
+    fetchQuestions()
   }, [])
 
   const handleOptionChange = (index, value) => {
@@ -61,30 +87,67 @@ const QuestionEditor = () => {
     }
 
     try {
-      await window.api.invoke('add-question', [
-        question,
-        JSON.stringify(options),
-        answer,
-        tip,
-        categoryId
-      ])
-      toast({
-        title: 'Success',
-        description: 'Question added successfully.',
-        status: 'success',
-        duration: 5000,
-        isClosable: true
-      })
+      if (isEditing) {
+        await window.api.invoke(
+          'update-question',
+          editingQuestionId,
+          question,
+          JSON.stringify(options),
+          answer,
+          tip,
+          categoryId
+        )
+        // Atualize o estado questions após a atualização bem-sucedida
+        setQuestions((prevQuestions) =>
+          prevQuestions.map((q) =>
+            q.id === editingQuestionId
+              ? {
+                  ...q,
+                  question,
+                  options: JSON.stringify(options),
+                  answer,
+                  tip,
+                  category_id: categoryId
+                }
+              : q
+          )
+        )
+        toast({
+          title: 'Success',
+          description: 'Question updated successfully.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true
+        })
+      } else {
+        await window.api.invoke(
+          'add-question',
+          question,
+          JSON.stringify(options),
+          answer,
+          tip,
+          categoryId
+        )
+        toast({
+          title: 'Success',
+          description: 'Question added successfully.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true
+        })
+      }
       // Clear form after submission
       setQuestion('')
       setOptions([''])
       setAnswer('')
       setTip('')
       setCategoryId('')
+      setIsEditing(false)
+      setEditingQuestionId(null)
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to add question.',
+        description: isEditing ? 'Failed to update question.' : 'Failed to add question.',
         status: 'error',
         duration: 5000,
         isClosable: true
@@ -92,10 +155,50 @@ const QuestionEditor = () => {
     }
   }
 
+  const handleEdit = (q) => {
+    setQuestion(q.question)
+    setOptions(JSON.parse(q.options))
+    setAnswer(q.answer)
+    setTip(q.tip)
+    setCategoryId(q.category_id)
+    setIsEditing(true)
+    setEditingQuestionId(q.id)
+  }
+
+  const handleDelete = (id) => {
+    setDeletingQuestionId(id)
+    setIsAlertOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    try {
+      await window.api.invoke('delete-question', deletingQuestionId)
+      setQuestions(questions.filter((q) => q.id !== deletingQuestionId))
+      toast({
+        title: 'Success',
+        description: 'Question deleted successfully.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete question.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true
+      })
+    } finally {
+      setIsAlertOpen(false)
+      setDeletingQuestionId(null)
+    }
+  }
+
   return (
     <Box p={4}>
       <Heading as="h2" size="lg" mb={4}>
-        Create a Question
+        {isEditing ? 'Update Question' : 'Create a Question'}
       </Heading>
       <FormControl mb={4}>
         <FormLabel>Question:</FormLabel>
@@ -151,8 +254,68 @@ const QuestionEditor = () => {
         </Select>
       </FormControl>
       <Button onClick={handleSubmit} colorScheme="blue">
-        Submit Question
+        {isEditing ? 'Update Question' : 'Submit Question'}
       </Button>
+      <Heading as="h3" size="md" mt={8} mb={4}>
+        Questions List
+      </Heading>
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>ID</Th>
+            <Th>Question</Th>
+            <Th>Actions</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {questions.map((q) => (
+            <Tr key={q.id}>
+              <Td>{q.id}</Td>
+              <Td>{q.question}</Td>
+              <Td>
+                <IconButton
+                  icon={<EditIcon />}
+                  aria-label="Edit question"
+                  onClick={() => handleEdit(q)}
+                />
+                <IconButton
+                  icon={<DeleteIcon />}
+                  aria-label="Delete question"
+                  onClick={() => handleDelete(q.id)}
+                  ml={2}
+                />
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+
+      <AlertDialog
+        isOpen={isAlertOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsAlertOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Question
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you want to delete this question? This action cannot be undone.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setIsAlertOpen(false)}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={confirmDelete} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   )
 }

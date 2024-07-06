@@ -1,5 +1,5 @@
 const Database = require('better-sqlite3')
-const db = new Database('questions.db')
+const db = new Database('database.db')
 
 const createCategoryTable = db.prepare(`
   CREATE TABLE IF NOT EXISTS category (
@@ -39,14 +39,6 @@ function addCategory(name) {
   return result.lastInsertRowid
 }
 
-function addQuestion(question, options, answer, tip, categoryId) {
-  const insertQuestion = db.prepare(`
-    INSERT INTO questions (question, options, answer, tip, category_id) VALUES (?, ?, ?, ?, ?)
-  `)
-  const result = insertQuestion.run(question, options, answer, tip, categoryId)
-  return result.lastInsertRowid
-}
-
 function getCategories() {
   const selectCategories = db.prepare(`
     SELECT * FROM category
@@ -63,4 +55,43 @@ function deleteCategory(id) {
   return result.changes > 0
 }
 
-export { addCategory, addQuestion, getCategories, deleteCategory }
+function addQuestion(question, options, answer, tip, categoryId) {
+  const insertQuestion = db.prepare(`
+    INSERT INTO questions (question, options, answer, tip, category_id) VALUES (?, ?, ?, ?, ?)
+  `)
+  const result = insertQuestion.run(question, options, answer, tip, categoryId)
+  return result.lastInsertRowid
+}
+
+function deleteQuestion(id) {
+  const deleteQuestionStmt = db.prepare(`
+    DELETE FROM questions WHERE id = ?
+  `)
+  const result = deleteQuestionStmt.run(id)
+  return result.changes > 0
+}
+function getQuestions() {
+  const selectQuestions = db.prepare(`
+    SELECT * FROM questions
+  `)
+  const result = selectQuestions.all()
+  return result
+}
+
+function updateQuestion(question, options, answer, tip, categoryId, id) {
+  const updateQuestionStmt = db.prepare(`
+    UPDATE questions SET question = ?, options = ?, answer = ?, tip = ?, category_id = ? WHERE id = ?
+  `)
+  const result = updateQuestionStmt.run(question, options, answer, tip, categoryId, id)
+  return result.changes > 0
+}
+
+export {
+  addCategory,
+  addQuestion,
+  getCategories,
+  deleteCategory,
+  getQuestions,
+  updateQuestion,
+  deleteQuestion
+}
