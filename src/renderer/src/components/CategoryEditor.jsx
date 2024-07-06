@@ -53,7 +53,7 @@ const messages = {
   }
 }
 
-export default function TableCategories() {
+export default function CategoryEditorIntl() {
   const { locale } = useContext(LocaleContext)
 
   return (
