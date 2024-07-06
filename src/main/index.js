@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { addCategory, getCategories, deleteCategory } from './database'
+import { addCategory, getCategories, deleteCategory, addQuestion } from './database'
 
 function createWindow() {
   // Create the browser window.
@@ -63,6 +63,11 @@ app.whenReady().then(() => {
 
   ipcMain.handle('delete-category', async (event, id) => {
     const result = await deleteCategory(id)
+    return result
+  })
+
+  ipcMain.handle('add-question', async (event, question, options, answer, tip, categoryId) => {
+    const result = await addQuestion(question, options, answer, tip, categoryId)
     return result
   })
 
