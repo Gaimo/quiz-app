@@ -70,11 +70,20 @@ function deleteQuestion(id) {
   const result = deleteQuestionStmt.run(id)
   return result.changes > 0
 }
+
 function getQuestions() {
   const selectQuestions = db.prepare(`
     SELECT * FROM questions
   `)
   const result = selectQuestions.all()
+  return result
+}
+
+function getRandomQuestion() {
+  const selectRandomQuestion = db.prepare(`
+    SELECT * FROM questions ORDER BY RANDOM() LIMIT 1
+  `)
+  const result = selectRandomQuestion.get()
   return result
 }
 
@@ -93,5 +102,6 @@ export {
   deleteCategory,
   getQuestions,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  getRandomQuestion
 }

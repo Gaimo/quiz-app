@@ -30,13 +30,13 @@ const messages = {
   'en-US': {
     'update-question': 'Update Question',
     'create-question': 'Create a Question',
-    'question-label': 'Question:',
-    'options-label': 'Options:',
+    'question-label': 'Question*:',
+    'options-label': 'Options*:',
     'add-option': 'Add Option',
     'correct-answer-label': 'Correct Answer:',
     'select-correct-answer': 'Select the correct answer',
     'tip-label': 'Tip:',
-    'category-label': 'Category:',
+    'category-label': 'Category*:',
     'select-category': 'Select a category',
     'update-question-button': 'Update Question',
     'submit-question-button': 'Submit Question',
@@ -62,13 +62,13 @@ const messages = {
   'pt-BR': {
     'update-question': 'Atualizar Pergunta',
     'create-question': 'Criar uma Pergunta',
-    'question-label': 'Pergunta:',
-    'options-label': 'Opções:',
+    'question-label': 'Pergunta*:',
+    'options-label': 'Opções*:',
     'add-option': 'Adicionar Opção',
     'correct-answer-label': 'Resposta Correta:',
     'select-correct-answer': 'Selecione a resposta correta',
     'tip-label': 'Dica:',
-    'category-label': 'Categoria:',
+    'category-label': 'Categoria*:',
     'select-category': 'Selecione uma categoria',
     'update-question-button': 'Atualizar Pergunta',
     'submit-question-button': 'Enviar Pergunta',
@@ -287,7 +287,7 @@ const QuestionEditor = () => {
   }
 
   return (
-    <Box p={4}>
+    <Box minW="700px">
       <Box p={4} borderWidth={1} borderRadius="lg">
         <Heading as="h2" size="lg" mb={4}>
           {isEditing
@@ -354,41 +354,45 @@ const QuestionEditor = () => {
         </Button>
       </Box>
 
-      <Heading as="h3" size="md" mt={8} mb={4}>
-        {formatMessage({ id: 'questions-list' })}
-      </Heading>
-      <Box p={4} borderWidth={1} borderRadius="lg">
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>{formatMessage({ id: 'id-column' })}</Th>
-              <Th>{formatMessage({ id: 'question-column' })}</Th>
-              <Th>{formatMessage({ id: 'actions-column' })}</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {questions.map((q) => (
-              <Tr key={q.id}>
-                <Td>{q.id}</Td>
-                <Td>{q.question}</Td>
-                <Td>
-                  <IconButton
-                    icon={<EditIcon />}
-                    aria-label="Edit question"
-                    onClick={() => handleEdit(q)}
-                  />
-                  <IconButton
-                    icon={<DeleteIcon />}
-                    aria-label="Delete question"
-                    onClick={() => handleDelete(q.id)}
-                    ml={2}
-                  />
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </Box>
+      {questions.length > 0 && (
+        <>
+          <Heading as="h3" size="md" mt={8} mb={4}>
+            {formatMessage({ id: 'questions-list' })}
+          </Heading>
+          <Box p={4} borderWidth={1} borderRadius="lg">
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>{formatMessage({ id: 'id-column' })}</Th>
+                  <Th>{formatMessage({ id: 'question-column' })}</Th>
+                  <Th>{formatMessage({ id: 'actions-column' })}</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {questions.map((q) => (
+                  <Tr key={q.id}>
+                    <Td>{q.id}</Td>
+                    <Td>{q.question}</Td>
+                    <Td>
+                      <IconButton
+                        icon={<EditIcon />}
+                        aria-label="Edit question"
+                        onClick={() => handleEdit(q)}
+                      />
+                      <IconButton
+                        icon={<DeleteIcon />}
+                        aria-label="Delete question"
+                        onClick={() => handleDelete(q.id)}
+                        ml={2}
+                      />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
+        </>
+      )}
 
       <AlertDialog
         isOpen={isAlertOpen}

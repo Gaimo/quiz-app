@@ -9,13 +9,14 @@ import {
   addQuestion,
   getQuestions,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  getRandomQuestion
 } from './database'
 
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
+    width: 1000,
     height: 670,
     show: false,
     autoHideMenuBar: true,
@@ -86,6 +87,11 @@ app.whenReady().then(() => {
 
   ipcMain.handle('get-questions', async () => {
     const result = await getQuestions()
+    return result
+  })
+
+  ipcMain.handle('get-random-question', async () => {
+    const result = await getRandomQuestion()
     return result
   })
 

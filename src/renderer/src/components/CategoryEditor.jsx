@@ -6,7 +6,6 @@ import {
   FormControl,
   FormLabel,
   useToast,
-  Heading,
   TableContainer,
   Table,
   Thead,
@@ -118,61 +117,56 @@ function CategoryEditor() {
   }
 
   return (
-    <Box p={4} maxW="600px">
-      <Heading mt={4} mb={4}>
-        {formatMessage({ id: 'categories-heading' })}
-      </Heading>
-      <Box p={4} borderWidth={1} borderRadius="lg">
-        <FormControl id="new-category">
-          <FormLabel>{formatMessage({ id: 'new-category-label' })}</FormLabel>
-          <Box display="flex" alignItems="center" gap="10px">
-            <Input
-              type="text"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder={formatMessage({ id: 'enter-category-placeholder' })}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleAddCategory()
-                }
-              }}
-            />
-            <IconButton
-              colorScheme="teal"
-              onClick={handleAddCategory}
-              icon={<AddIcon />}
-              aria-label={formatMessage({ id: 'add-category' })}
-            />
-          </Box>
-        </FormControl>
-        <Box mt={4} borderWidth={1} borderRadius="lg">
-          <TableContainer>
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th w="30px">{formatMessage({ id: 'id-column' })}</Th>
-                  <Th>{formatMessage({ id: 'category-column' })}</Th>
-                  <Th w="100px">{formatMessage({ id: 'action-column' })}</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {categories.map((category) => (
-                  <Tr key={category.id}>
-                    <Td>{category.id}</Td>
-                    <Td>
-                      {category.name.charAt(0).toUpperCase() + category.name.slice(1).toLowerCase()}
-                    </Td>
-                    <Td>
-                      <Button colorScheme="red" onClick={() => handleDeleteCategory(category.id)}>
-                        {formatMessage({ id: 'delete-button' })}
-                      </Button>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </TableContainer>
+    <Box p={4} borderWidth={1} borderRadius="lg" maxW="600px">
+      <FormControl id="new-category">
+        <FormLabel>{formatMessage({ id: 'new-category-label' })}</FormLabel>
+        <Box display="flex" alignItems="center" gap="10px">
+          <Input
+            type="text"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            placeholder={formatMessage({ id: 'enter-category-placeholder' })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleAddCategory()
+              }
+            }}
+          />
+          <IconButton
+            colorScheme="teal"
+            onClick={handleAddCategory}
+            icon={<AddIcon />}
+            aria-label={formatMessage({ id: 'add-category' })}
+          />
         </Box>
+      </FormControl>
+      <Box mt={4} borderWidth={1} borderRadius="lg">
+        <TableContainer>
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th w="30px">{formatMessage({ id: 'id-column' })}</Th>
+                <Th>{formatMessage({ id: 'category-column' })}</Th>
+                <Th w="100px">{formatMessage({ id: 'action-column' })}</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {categories.map((category) => (
+                <Tr key={category.id}>
+                  <Td>{category.id}</Td>
+                  <Td>
+                    {category.name.charAt(0).toUpperCase() + category.name.slice(1).toLowerCase()}
+                  </Td>
+                  <Td>
+                    <Button colorScheme="red" onClick={() => handleDeleteCategory(category.id)}>
+                      {formatMessage({ id: 'delete-button' })}
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
       </Box>
     </Box>
   )
